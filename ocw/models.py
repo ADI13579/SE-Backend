@@ -1,10 +1,7 @@
 import uuid
 from sqlite3 import Date
-
-from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from datetime import date
 from django.utils import timezone
 
 class UserAccountManager(BaseUserManager):
@@ -36,9 +33,7 @@ class UserAccountManager(BaseUserManager):
 
         return user
 
-
 class UserAccount(AbstractBaseUser, PermissionsMixin):
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
@@ -62,16 +57,50 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.first_name+" "+self.last_name
 
-
-class Courses(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    instructor = models.ForeignKey(UserAccount, default=None, on_delete=models.CASCADE)
-    title = models.CharField(max_length=100, default=None)
-    description = models.CharField(max_length=1000, default=None)
-    # rating complex for now
-    duration = models.PositiveSmallIntegerField(default=6)
-    thumbnail = models.ImageField(upload_to='thumbnail', null=True)
-
+class Program(models.Model):
+    code= models.CharField(primary_key=True,max_length=10, default=None)
+    name= models.CharField(max_length=50, default=None)
     def __str__(self):
-        return self.title
+        return self.code
 
+class Department(models.Model):
+    code= models.CharField(primary_key=True,max_length=10, default=None)
+    name= models.CharField(max_length=50, default=None)
+    program = models.ForeignKey(Program, default=None, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.code+'('+self.name+')'
+
+class Subject(models.Model):
+    code= models.CharField(primary_key=True,max_length=10, default=None)
+    level=models.CharField(max_length=10,blank=True)
+    syllabus=models.FileField(upload_to='syllabus',blank=True)
+    name= models.CharField(max_length=100, default=None)
+    elective=models.BooleanField(default=False)
+    implemented_on = models.DateField(null=False)    
+    department = models.ForeignKey(Department, default=None, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.code+'('+self.name+')'
+
+class Semester(models.Model):
+    year= models.PositiveSmallIntegerField(default=None)
+    part= models.PositiveSmallIntegerField(default=None)
+    department=models.ForeignKey(Department,default=None,on_delete=models.CASCADE)
+
+class BachelorSubject(models.Model):
+    hours= models.PositiveSmallIntegerField(default=None)
+    external_marks=models.PositiveSmallIntegerField(default=80)
+    internal_marks=models.PositiveSmallIntegerField(default=20)
+    practical_marks=models.PositiveSmallIntegerField(default=None)
+    elective=models.BooleanField(default=False)
+    subject = models.ForeignKey(Subject, default=None, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.subject
+
+class MasterSubject(models.Model):
+    credit= models.PositiveSmallIntegerField(default=None)
+    internal=models.PositiveSmallIntegerField(default=80)
+    external=models.PositiveSmallIntegerField(default=20)
+    practical_marks=models.PositiveSmallIntegerField(default=None)
+    subject = models.ForeignKey(Subject, default=None, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.subject
