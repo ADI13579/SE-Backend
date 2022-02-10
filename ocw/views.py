@@ -1,11 +1,10 @@
-from rest_framework import generics,permissions
+from rest_framework import generics
 from .models import UserAccount
 # from .serializers import GetCourseSerializer,CreateCourseSerializer,CompleteCourseSerializer,UpdateCourseSerializer,CreateLessonSerializer,CompleteLessonSerializer,UpdateLessonSerializer,CommentSerializer,BasicUserSerializer
 from .serializers import  BasicUserSerializer
 # from .permissions import CourseModify,LessonModify
 
 class GetUserInfo(generics.ListAPIView):
-    permissions_classes=(permissions.IsAuthenticated,)
     queryset=UserAccount.objects.all()
     serializer_class=BasicUserSerializer
 

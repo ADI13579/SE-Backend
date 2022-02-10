@@ -20,8 +20,8 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/',include('djoser.urls')),
-    path('auth/',include('djoser.urls.jwt')),
+    path('',include('djoser.urls')),
+    path('',include('djoser.urls.jwt')),
     path('api/',include('ocw.urls')),
 ]
 

@@ -36,16 +36,11 @@ class UserAccountManager(BaseUserManager):
 class UserAccount(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=255, unique=True)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    is_instructor = models.BooleanField(default=False)
+    username = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    isInstructor = models.BooleanField(default=False)
     image = models.ImageField(null=True)
-    dob = models.DateField(null=False)
-    date_joined = models.DateField(auto_now_add=True)
-
+    
     objects = UserAccountManager()
 
     USERNAME_FIELD = 'email'
@@ -73,7 +68,6 @@ class Department(models.Model):
 class Subject(models.Model):
     code= models.CharField(primary_key=True,max_length=10, default=None)
     level=models.CharField(max_length=10,blank=True)
-    syllabus=models.FileField(upload_to='syllabus',blank=True)
     name= models.CharField(max_length=100, default=None)
     elective=models.BooleanField(default=False)
     implemented_on = models.DateField(null=False)    
@@ -91,6 +85,7 @@ class BachelorSubject(models.Model):
     external_marks=models.PositiveSmallIntegerField(default=80)
     internal_marks=models.PositiveSmallIntegerField(default=20)
     practical_marks=models.PositiveSmallIntegerField(default=None)
+    syllabus=models.FileField(upload_to='syllabus',blank=True)
     elective=models.BooleanField(default=False)
     subject = models.ForeignKey(Subject, default=None, on_delete=models.CASCADE)
     def __str__(self):
@@ -100,6 +95,7 @@ class MasterSubject(models.Model):
     credit= models.PositiveSmallIntegerField(default=None)
     internal=models.PositiveSmallIntegerField(default=80)
     external=models.PositiveSmallIntegerField(default=20)
+    syllabus=models.FileField(upload_to='syllabus',blank=True)
     practical_marks=models.PositiveSmallIntegerField(default=None)
     subject = models.ForeignKey(Subject, default=None, on_delete=models.CASCADE)
     def __str__(self):
