@@ -4,13 +4,19 @@ from rest_framework import serializers
 from rest_framework import status
 from .models import Program
 from .serializers import ProgramSerializer
-@api_view(['GET'])
-def ApiOverview(request):
-	api_urls = {
-		"happy":"coding"
-	}
+from rest_framework.views import APIView
 
-	return Response(api_urls)
+class ApiOverview(APIView):
+    """
+    List all Transformers, or create a new Transformer
+    """
+  
+    def get(self, request):
+
+        return Response({"happy":"coding"})
+  
+
+
 
 
 
