@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "SE",
+    "rest_framework",
+    'SE.apps.SeConfig',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +87,7 @@ DATABASES = {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',  
             'NAME': 'SE',  
             'USER':'postgres',  
-            'PASSWORD':'postgres',  
+            'PASSWORD':'new_password',  
             'HOST':'localhost',  
             'PORT':'5432'  
         }  
