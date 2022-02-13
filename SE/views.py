@@ -7,12 +7,7 @@ from .serializers import ProgramSerializer
 @api_view(['GET'])
 def ApiOverview(request):
 	api_urls = {
-		'all_items': '/',
-		'Search by Category': '/?category=category_name',
-		'Search by Subcategory': '/?subcategory=category_name',
-		'Add': '/create',
-		'Update': '/update/pk',
-		'Delete': '/item/pk/delete'
+		"happy":"coding"
 	}
 
 	return Response(api_urls)
