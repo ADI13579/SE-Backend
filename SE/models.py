@@ -10,9 +10,20 @@ class Department(models.Model):
         return self.dept_code
 # BCT
 class Program(models.Model):
+    BACHELORS = 'BE'
+    MASTERS = 'MSC'
+
+    CHOICES_A = (
+        (BACHELORS, BACHELORS),
+        (MASTERS, MASTERS),
+    )
     prog_code= models.CharField(primary_key=True,max_length=100, default=None)
     prog_name= models.CharField(max_length=100, default=None)
     dept_code=models.ForeignKey(Department,default=None,on_delete=models.CASCADE,db_column="dept_code")
+    description= models.CharField(max_length=500, blank = True)
+    level_code= models.CharField(max_length=100,choices=CHOICES_A ,default=None)
+
+
     def __str__(self):
         return self.prog_code
 
