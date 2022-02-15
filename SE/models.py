@@ -18,10 +18,11 @@ class Program(models.Model):
         (MASTERS, MASTERS),
     )
     prog_code= models.CharField(primary_key=True,max_length=100, default=None)
-    prog_name= models.CharField(max_length=100, default=None)
-    dept_code=models.ForeignKey(Department,default=None,on_delete=models.CASCADE,db_column="dept_code")
-    description= models.CharField(max_length=500, blank = True)
+    prog_name= models.CharField(max_length=100, default="default_name")
+    dept_code=models.ForeignKey(Department,default="RND",on_delete=models.CASCADE,db_column="dept_code")
+    description= models.CharField(max_length=500, blank = True, default = "description")
     level_code= models.CharField(max_length=100,choices=CHOICES_A ,default=None)
+
 
 
     def __str__(self):
@@ -38,6 +39,10 @@ class Subject(models.Model):
         return self.sub_code+'('+self.sub_name+')'
 
 class Semester(models.Model):
+    class Meta:
+        unique_together = (('year', 'part','prog_code'),)
+
+
     year= models.PositiveSmallIntegerField(default=None)
     part= models.PositiveSmallIntegerField(default=None)
     prog_code = models.ForeignKey(Program, default=None, on_delete=models.CASCADE,db_column="prog_code")

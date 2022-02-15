@@ -2,7 +2,8 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
 
-def success(operation,msg, data, status = status.HTTP_200_OK):
+def success(operation,msg, data=None, status = status.HTTP_200_OK):
+    # return Response()
     return Response(
         {"operation":operation,
         "success":True,

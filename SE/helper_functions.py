@@ -65,7 +65,7 @@
       }
     ]
 }
-def format_get_levels(results, levelCode ):
+def format_get_levels(results, levelCode=None ):
     res = {
     "_id": {
       "$oid": "1"
@@ -101,11 +101,53 @@ def format_get_levels(results, levelCode ):
       # programs_detail[result["prog_code"]]["semesters"][semester]= programs_detail[result["prog_code"]]["semesters"].get(semester,{"subjects":[]})["subjects"].append(result["sub_code"]) #{"subjects":[]}
       # programs_detail[result["prog_code"]]["semesters"][semester]= programs_detail[result["prog_code"]]["semesters"].get(semester,{"subjects":[]})["subjects"].append(result["sub_code"]) #{"subjects":[]}
       programs_detail[result["prog_code"]]["semesters"][semester] = programs_detail[result["prog_code"]]["semesters"].get(semester,{"subjects":[]})
-      programs_detail[result["prog_code"]]["semesters"][semester]["subjects"].append(result["sub_code"])
+      if  levelCode:
+        programs_detail[result["prog_code"]]["semesters"][semester]["subjects"].append(result["sub_code"])
+      else:
+        '''{
+            "_id": {
+              "$oid": "611a186499d67e88b3fac1cd"
+            },
+            "code": "SH401",
+            "level": "BE",
+            "name": "Maths",
+            "filename": "f3323144-db4a-460b-bd29-8108a72459e1.pdf"
+          },'''
+        programs_detail[result["prog_code"]]["semesters"][semester]["subjects"].append(
+          {
+            "_id": {
+              "$oid": result["sub_code"]
+            },
+            "code": result["sub_code"],
+            "name": result["sub_code__sub_name"],
+
+          }
+        )
+
+
     # x = (programs_detail.values())
     res["programs"].extend(programs_detail.values())
     return res
 
 
-    
+def format_get_programs(results):
+  '''
+      {"_id": {
+        "$oid": "611a1abe89394f141864c095"
+      },
+      "code": "BCE",
+      "name": "Bachelor in civil engineering",
+          }'''
+  return [
+    {"_id": {
+        "$oid": result["prog_code"]
+      },
+      "code": result["prog_code"],
+      "name": result["prog_name"],
+          }
+          for result in results
+
+  ]
+
+
 
