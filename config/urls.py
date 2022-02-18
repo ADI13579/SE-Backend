@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('SE.urls')),
+    path('files/syllabus/<str:filePath>', views.download_file, name="Download"),
 ]

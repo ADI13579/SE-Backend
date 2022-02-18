@@ -1,5 +1,6 @@
 from pyexpat import model
 from django.db import models
+import uuid
 
 # Create your models here.
 # DOECE
@@ -51,21 +52,28 @@ class Semester(models.Model):
         return str(self.year)+' '+str(self.part)+' '+str(self.prog_code)+' '+str(self.sub_code)
 
 class BachelorSubject(models.Model):
-    hours= models.PositiveSmallIntegerField(default=None)
-    external_marks=models.PositiveSmallIntegerField(default=80)
-    internal_marks=models.PositiveSmallIntegerField(default=20)
-    practical_marks=models.PositiveSmallIntegerField(default=None)
-    syllabus=models.FileField(upload_to='syllabus',blank=True)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, editable=False,max_length=200)
+    hours= models.PositiveSmallIntegerField(null=True,blank=True)
+    theory_marks=models.PositiveSmallIntegerField(default=80)
+    practical_marks=models.PositiveSmallIntegerField(null=True,blank=True)
+    syllabus=models.FileField(upload_to='syllabus',null=True,blank=True)
+    sub_code = models.ForeignKey(Subject,null=True,blank=True, on_delete=models.CASCADE,db_column="sub_code")
+    revised_on = models.DateTimeField(null=True,blank=True)    
+    revised=models.BooleanField(default=False)
     elective=models.BooleanField(default=False)
-    sub_code = models.ForeignKey(Subject, default=None, on_delete=models.CASCADE,db_column="sub_code")
+    remarks=models.CharField(max_length=200,null=True,blank=True)
     def __str__(self):
         return self.sub_code.sub_name
 
 class MasterSubject(models.Model):
+    id = models.CharField(primary_key=True, default=uuid.uuid4, editable=False,max_length=200) 
     credit= models.PositiveSmallIntegerField(default=4)
     internal=models.PositiveSmallIntegerField(default=20)
     external=models.PositiveSmallIntegerField(default=80)
-    syllabus=models.FileField(upload_to='syllabus',blank=True)
-    sub_code = models.ForeignKey(Subject, default=None, on_delete=models.CASCADE,db_column="sub_code")
+    syllabus=models.FileField(upload_to='syllabus',null=True,blank=True)
+    sub_code = models.ForeignKey(Subject, null=True,blank=True, on_delete=models.CASCADE,db_column="sub_code")
+    revised=models.BooleanField(default=False)
+    revised_on = models.DateField(null=True,blank=True)    
+    remarks=models.CharField(max_length=200,null=True,blank=True)
     def __str__(self):
-        return self.sub_code.sub_name
+        return self.sub_code.sub_name+"("+self.sub_code+"):"+self.revised_on
