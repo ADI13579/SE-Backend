@@ -12,6 +12,8 @@ urlpatterns = [
     path('program/<str:progCode>', views.OneProgram.as_view(), name='OneProgram'),
     path('subjects', views.Subjects.as_view(), name = "Subjects"),
     path('subject/<str:subCode>', views.OneSubject.as_view(), name="OneSubject"),
-    path('bulk/programs', views.ProgramsUpload.as_view(), name="ProgramsUpload"),
+    path('bulk/subject', views.ProgramsUpload.as_view(), name="ProgramsUpload"),
+    path('bulk/syllabus', views.SyllabusUpload.as_view(), name="SyllabusUpload"),
+    
       
 ]
