@@ -41,7 +41,7 @@ class Subject(models.Model):
 
 class Semester(models.Model):
     class Meta:
-        unique_together = (('year', 'part','prog_code'),)
+        unique_together = (('year', 'part','prog_code',"sub_code"),)
 
 
     year= models.PositiveSmallIntegerField(default=None)
@@ -58,12 +58,12 @@ class BachelorSubject(models.Model):
     practical_marks=models.PositiveSmallIntegerField(null=True,blank=True)
     syllabus=models.FileField(upload_to='syllabus',null=True,blank=True)
     sub_code = models.ForeignKey(Subject,null=True,blank=True, on_delete=models.CASCADE,db_column="sub_code")
-    revised_on = models.DateTimeField(null=True,blank=True)    
+    revised_on = models.DateField(null=True,blank=True)    
     revised=models.BooleanField(default=False)
     elective=models.BooleanField(default=False)
     remarks=models.CharField(max_length=200,null=True,blank=True)
     def __str__(self):
-        return self.sub_code.sub_name
+        return f"{self.sub_code.__str__()} : {self.revised_on}"
 
 class MasterSubject(models.Model):
     id = models.CharField(primary_key=True, default=uuid.uuid4, editable=False,max_length=200) 
@@ -76,4 +76,4 @@ class MasterSubject(models.Model):
     revised_on = models.DateField(null=True,blank=True)    
     remarks=models.CharField(max_length=200,null=True,blank=True)
     def __str__(self):
-        return self.sub_code.sub_name+"("+self.sub_code+"):"+self.revised_on
+        return f"{self.sub_code.__str__()} : {self.revised_on}"# self.sub_code.sub_name+"("+self.sub_code+"):"+self.revised_on

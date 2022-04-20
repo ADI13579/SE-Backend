@@ -234,13 +234,13 @@ class Subjects(APIView):
             )
 
     def post(self, request):
-        try:
+        # try:
             dataIn = request.data
             print(dataIn)
             program = Program.objects.filter(prog_code=dataIn["progCode"])
             subject = Subject(
                 sub_code=dataIn["subCode"],
-                sub_name=dataIn["name"],
+                sub_name=dataIn["subName"],
                 prog_code=program[0],
                 implemented_on=datetime.date.today()
             )
@@ -251,11 +251,11 @@ class Subjects(APIView):
                 "One subject added succesfully",
 
             )
-        except Exception as e:
-            return utils.failure(
-                "One subject addition",
-                str(e)
-            )
+        # except Exception as e:
+        #     return utils.failure(
+        #         "One subject addition",
+        #         str(e)
+        #     )
 
 
 class OneSubject(APIView):
@@ -332,15 +332,16 @@ class OneSubject(APIView):
             # if the sub_code doesnt exist create a new subject
             if(not len(Subject.objects.filter(sub_code=subCode))):
                 assert "subject doesn't exist"
-            else:
-                sub = Subject.objects.get(sub_code=subCode)
+            
 
+            sub = Subject.objects.get(sub_code=subCode)
             # sub.sub_code=data['subCode']
             sub.sub_name = data['name']
+            print(sub.sub_name )
             sub.level = level
             sub.prog_code = prog[0]
             # sub.implemented_on=datetime.date(int(data['batch']),1,1)
-            sub.save
+            sub.save()
             # If found the old_batch and old_code then any of it can be renamed else a new object is created
             if(level == "BE"):
 
@@ -367,7 +368,7 @@ class OneSubject(APIView):
                 mas = MasterSubject()
                 if(len(MasterSubject.objects.filter(sub_code=subCode))):
                     if(data.get('batch') and len(MasterSubject.objects.filter(sub_code=subCode, revised_on=datetime.date(int(data['batch']), 1, 1)))):
-                        mas = MasterSubject.objects.filter(
+                        mas = MasterSubject.objects.get(
                             sub_code=subCode, revised_on=datetime.date(int(data['batch']), 1, 1))
 
 
@@ -380,7 +381,7 @@ class OneSubject(APIView):
                 mas.sub_code = sub
                 mas.revised_on = datetime.date(int(data.get('batch',datetime.date.today().year)), 1, 1)
                 mas.remarks = data['remarks']
-                if(len(MasterSubject.objects.all().filter(sub_code=bach.sub_code))):
+                if(len(MasterSubject.objects.all().filter(sub_code=mas.sub_code))):
                     mas.revised = True
                 mas.save()
                 response_data = str(mas.id)
@@ -400,55 +401,137 @@ class OneSubject(APIView):
         #     )
 
 
-class ProgramsUpload(APIView):
+# class ProgramsUpload(APIView):
+#     def post(self, request):
+#         try:
+
+#             data = request.FILES['file']
+#             df = pd.read_csv(data)
+#             df["implemented"] = pd.to_datetime(df["implemented"])
+#             dept_codes = defaultdict(str)
+#             prog_codes = defaultdict(str)
+#             sub_codes = defaultdict(str)
+
+#             for i, row in df.iterrows():
+#                 try:
+#                     dept_code = dept_codes[row["dept_code"].upper()]
+#                     if dept_code == "":
+#                         dept_codes[row["dept_code"].upper()] = Department.objects.get(
+#                             dept_code=row["dept_code"].upper())
+#                 except Department.DoesNotExist:
+#                     dept_codes[row["dept_code"].upper()] = Department.objects.create(
+#                         dept_code=row["dept_code"].upper(), dept_name=row["dept_name"])
+
+#                 try:
+#                     prog_code = prog_codes[row["prog_code"].upper()]
+#                     if prog_code == "":
+#                         prog_codes[row["prog_code"].upper()] = Program.objects.get(
+#                             prog_code=row["prog_code"].upper())
+#                 except Program.DoesNotExist:
+#                     prog_codes[row["prog_code"].upper()] = Program.objects.create(prog_code=row["prog_code"].upper(), prog_name=row["prog_name"],
+#                                                                                   level_code=row["level"], dept_code=dept_codes[row["dept_code"].upper()], description=row["description"])
+
+#                 try:
+#                     sub_code = sub_codes[row["sub_code"].upper()]
+#                     if sub_code == "":
+#                         sub_codes[row["sub_code"].upper()] = Subject.objects.get(
+#                             sub_code=row["sub_code"].upper())
+#                 except Subject.DoesNotExist:
+#                     sub_codes[row["sub_code"].upper()] = Subject.objects.create(sub_code=row["sub_code"].upper(), sub_name=row["sub_name"], level=row["level"],
+#                                                                                 prog_code=prog_codes[row["prog_code"].upper()], elective=row["elective"], implemented_on=row["implemented"])
+
+#                 _ = Semester.objects.get_or_create(year=row["year"], part=row["part"], sub_code=sub_codes[row["sub_code"].upper(
+#                 )], prog_code=prog_codes[row["prog_code"].upper()])
+
+#             return utils.success(
+#                 "Bulk upload subject ",
+#                 "Bulk uploaded subject succesfully",
+
+#             )
+#         except Exception as e:
+#             return utils.failure(
+#                 "Bulk upload subject",
+#                 str(e)
+#             )
+
+
+class BulkProgramsUpload(APIView):
     def post(self, request):
-        try:
+        data = request.FILES['csv_file']
+        df = pd.read_csv(data)
+        df["implemented"] = pd.to_datetime(df["implemented"])
+        dept_codes = defaultdict(str)
+        prog_codes = defaultdict(str)
+        sub_codes = defaultdict(str)
 
-            data = request.FILES['file']
-            df = pd.read_csv(data)
-            df["implemented"] = pd.to_datetime(df["implemented"])
-            dept_codes = defaultdict(str)
-            prog_codes = defaultdict(str)
-            sub_codes = defaultdict(str)
+        for i, row in df.iterrows():
+            try:
+                dept_code = dept_codes[row["dept_code"].upper()]
+                if dept_code=="":
+                    dept_codes[row["dept_code"].upper()] = Department.objects.get(dept_code=row["dept_code"].upper())
+            except Department.DoesNotExist:
+                dept_codes[row["dept_code"].upper()] = Department.objects.create(dept_code=row["dept_code"].upper(), dept_name=row["dept_name"])
+            
+            try:
+                prog_code = prog_codes[row["prog_code"].upper()]
+                if prog_code=="":
+                    prog_codes[row["prog_code"].upper()] = Program.objects.get(prog_code=row["prog_code"].upper())
+            except Program.DoesNotExist:
+                prog_codes[row["prog_code"].upper()] = Program.objects.create(prog_code=row["prog_code"].upper(), prog_name=row["prog_name"], \
+                    level_code=row["level"], dept_code=dept_codes[row["dept_code"].upper()], description=row["description"])
 
-            for i, row in df.iterrows():
+            try:
+                sub_code = sub_codes[row["sub_code"].upper()]
+                if sub_code=="":
+                    sub_codes[row["sub_code"].upper()] = Subject.objects.get(sub_code=row["sub_code"].upper())
+            except Subject.DoesNotExist:
+                sub_codes[row["sub_code"].upper()] = Subject.objects.create(sub_code=row["sub_code"].upper(), sub_name=row["sub_name"], level=row["level"], \
+                    prog_code=prog_codes[row["prog_code"].upper()], elective=row["elective"], implemented_on=row["implemented"])            
+
+            try:
+                _ = Semester.objects.get_or_create(year=row["year"], part=row["part"], sub_code=sub_codes[row["sub_code"].upper()], prog_code=prog_codes[row["prog_code"].upper()])
+            except:
+                print("Error in creating semester")
+
+        return Response({})
+
+
+
+class BulkSyllabusUpload(APIView):
+    def post(self,request):
+        data = request.FILES['csv_file']
+        df = pd.read_csv(data)
+        images = request.FILES.getlist('syllabus')
+        files = {}
+        if len(images) != df.shape[0]:
+            return Response("Number of images and subjects do not match")
+        
+        for i,file in enumerate(images):
+            files[file.name] = i
+
+        sub_codes = defaultdict(str)
+
+        for i, row in df.iterrows():
+            try:
+                sub_code = sub_codes[row["sub_code"].upper()]
+                if sub_code=="":
+                    sub_codes[row["sub_code"].upper()] = Subject.objects.get(sub_code=row["sub_code"].upper())
+            except Subject.DoesNotExist:
+                print(f"Subject doesn't exist for the {i+1}th row. Unable to add the syllabus")
+                
+            
+            if True or request.POST.get('level')=="BE":
+                # try:
+                _ = BachelorSubject.objects.create(hours=row["hours"], theory_marks=row["theory"], practical_marks=row["practical"], \
+                        sub_code=sub_codes[row["sub_code"].upper()], syllabus=images[files[row["syllabus"]]])
+                # except:
+                    # print("Error in creating Bachelor subject")
+            elif request.POST.get('level')=="Msc":
                 try:
-                    dept_code = dept_codes[row["dept_code"].upper()]
-                    if dept_code == "":
-                        dept_codes[row["dept_code"].upper()] = Department.objects.get(
-                            dept_code=row["dept_code"].upper())
-                except Department.DoesNotExist:
-                    dept_codes[row["dept_code"].upper()] = Department.objects.create(
-                        dept_code=row["dept_code"].upper(), dept_name=row["dept_name"])
+                    _ = MasterSubject.objects.create(hours=row["hours"], external=row["external"], internal=row["internal"], \
+                        sub_code=sub_codes[row["sub_code"].upper()], \
+                        syllabus=images[files[row["syllabus"]]], elective=row["elective"])
+                except:
+                    print("Error in creating Master subject")
 
-                try:
-                    prog_code = prog_codes[row["prog_code"].upper()]
-                    if prog_code == "":
-                        prog_codes[row["prog_code"].upper()] = Program.objects.get(
-                            prog_code=row["prog_code"].upper())
-                except Program.DoesNotExist:
-                    prog_codes[row["prog_code"].upper()] = Program.objects.create(prog_code=row["prog_code"].upper(), prog_name=row["prog_name"],
-                                                                                  level_code=row["level"], dept_code=dept_codes[row["dept_code"].upper()], description=row["description"])
-
-                try:
-                    sub_code = sub_codes[row["sub_code"].upper()]
-                    if sub_code == "":
-                        sub_codes[row["sub_code"].upper()] = Subject.objects.get(
-                            sub_code=row["sub_code"].upper())
-                except Subject.DoesNotExist:
-                    sub_codes[row["sub_code"].upper()] = Subject.objects.create(sub_code=row["sub_code"].upper(), sub_name=row["sub_name"], level=row["level"],
-                                                                                prog_code=prog_codes[row["prog_code"].upper()], elective=row["elective"], implemented_on=row["implemented"])
-
-                _ = Semester.objects.get_or_create(year=row["year"], part=row["part"], sub_code=sub_codes[row["sub_code"].upper(
-                )], prog_code=prog_codes[row["prog_code"].upper()])
-
-            return utils.success(
-                "Bulk upload subject ",
-                "Bulk uploaded subject succesfully",
-
-            )
-        except Exception as e:
-            return utils.failure(
-                "Bulk upload subject",
-                str(e)
-            )
+        return Response({})
